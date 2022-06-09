@@ -46,17 +46,21 @@ def setup():
                                 host = host,
                                 port = port,
                                 passwd = passwd1)
-
-    databases = []
+    #Database selection / creation                            
     while True:
-        print("Do you want to create a yes or no?")
+        print("Do you want to create database a yes or no?")
         DBCreation = input("\t Type 1 for yes and Type 2 for no:\n \t Enter: ")
         if int(DBCreation) == 1:
             name = input("Name your database please: ")
-            databases.append(name)
+            databases = open("databases.txt", "a")
+            databases.write(name + ",")
+            databases.close()
             create_database(conn, name)
         elif int(DBCreation) == 2:
-            print("Which database do you want to use: ", databases)
+            print("Which database do you want to use: ")
+            databases = open("databases.txt", "r")
+            print("Created databases:", databases.read())
+            databases.close()
             name = input("The database you want: ")
             use_database(conn, name)
             break
