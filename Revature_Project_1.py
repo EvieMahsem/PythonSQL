@@ -1,3 +1,4 @@
+import maskpass
 import mysql.connector
 
 
@@ -34,10 +35,11 @@ def use_database(connection, databsae_name):
 
 def setup():
     # User inputted MySQL server info
-    username = input("Input you MySql username: ")
-    host = input("Input you MySql hostname: ")
+    username = input("Input your MySql username: ")
+    host = input("Input your MySql hostname: ")
     port = input("What is your MySQL port: ")
-    passwd1 = input("Password for your connection: ")
+    passwd1 = maskpass.askpass(prompt="What is your MySQL password: ", mask="*")
+
     #Connecting to the server
     global conn
     conn = mysql.connector.connect(user = username,
@@ -48,7 +50,7 @@ def setup():
     databases = []
     while True:
         print("Do you want to create a yes or no?")
-        DBCreation = input("\t Type 1 for yes\n \t Type 2 for no: ")
+        DBCreation = input("\t Type 1 for yes and Type 2 for no:\n \t Enter: ")
         if int(DBCreation) == 1:
             name = input("Name your database please: ")
             databases.append(name)
