@@ -15,6 +15,7 @@ def setup():
                                 port = port,
                                 passwd = passwd1)
 
+def database_selection_creation():
     #Database selection / creation                            
     while True:
         print("Do you want to create database a yes or no?")
@@ -120,16 +121,32 @@ def table_creation():
         else:
             break
 
+def table_insertion():
+    while True:
+        question = input("Would you like to insert into a table or make a change:\n \t 1. Insert data\n \t 2. Exit\n \t Enter a Number: ")
+        if int(question) == 1:
+            pass
+        elif int(question) == 2:
+            break
+        else:
+            print("Please input a vaild value.")
 
+def table_alteration():
+    pass
+
+def delete_data():
+    pass
+
+def show_tables():
+    pass
 
 def shutdown():
     conn.close()
 
 
-#Runs all of the functions (Will be turning this into a menu)
-setup()
-table_creation()
 
-shutdown()
+
+
+
 
 
