@@ -1,5 +1,23 @@
 import maskpass
 import mysql.connector
+import names
+import random
+from tabulate import tabulate
+
+
+
+
+
+def table_random():
+    pass
+
+def delete_from_text(file, input):
+    with open(f"{file}", "r") as f:
+        lines = f.readlines()
+    with open(f"{file}", "w") as f:
+        for line in lines:
+            if line.strip("\n") != f"{input}":
+                f.write(line)    
 
 def setup():
     # User inputted MySQL server info
@@ -16,7 +34,7 @@ def setup():
                                 passwd = passwd1)
 
 def database_creation():
-    #Database selection / creation                            
+    #Database creation                            
     while True:
         #Text prompts and writes a file with created databases
         name = input("Name your database please: ")
@@ -37,19 +55,17 @@ def database_selection():
     print("Created databases:\n" + databases.read())
     databases.close()
     name = input("The database you want: ")
+    global database_selected
+    database_selected = name
 
     #Uses the database selected
     useObject = conn.cursor()
     useObject.execute(f"USE {name};")
 
-
 def table_creation():
     while True:
         #Text prompts and writes a file with created tables
         table_name = input("Name your table please: ")
-        tables = open("tables.txt", "a")
-        tables.write(table_name + "\n")
-        tables.close()
 
         #Text prompt for what type of table to make
         p_f_d = input("What type of key do you want?\n \t 1. Primary Key\n \t 2. Foreign Key\n \t 3. No Key (default) \n \t Response: ")
@@ -59,10 +75,16 @@ def table_creation():
 
             #Takes how many columns you want and will let you insert column_name and datatype pairs and then formats it into a 1 string
             col_datatype = []
+
             for i in range(int(num_of_col)):
                 x = input("What is column name and datatype (column_name datatype)?\nLink to datatypes: https://www.w3schools.com/mysql/mysql_datatypes.asp \n \t Your input please: ")
                 col_datatype.append(x)
             string_of_col = ",".join(col_datatype)
+
+
+            tables_col = open("tables.txt", "a")
+            tables_col.write(table_name + f":{database_selected}:PK:" + string_of_col + "\n")
+            tables_col.close()
 
             #Tells you the current columns and asks for which column should have the primary key
             print("The tables current columns: ", string_of_col)
@@ -92,6 +114,11 @@ def table_creation():
             key_table = input("Which table does the foreign key reference: ")
             key = input("Which column should the foreign key reference: ")
 
+            tables_col = open("tables.txt", "a")
+            tables_col.write(table_name + f":{database_selected}:FK({key}):" + string_of_col + "\n")
+            tables_col.close()
+
+
             #Runs the SQL code
             tableObject = conn.cursor()
             tableObject.execute(f"CREATE TABLE {table_name} ({string_of_col}, FOREIGN KEY ({key}) REFERENCES {key_table}({key}));")
@@ -106,6 +133,10 @@ def table_creation():
 
             #Tells you the current columns
             print("The tables current columns: ", string_of_col)
+
+            tables_col = open("tables.txt", "a")
+            tables_col.write(table_name + f":{database_selected}:NO_Key:" + string_of_col + "\n")
+            tables_col.close()
 
             #Runs the SQL code
             tableObject = conn.cursor()
@@ -126,7 +157,7 @@ def table_insertion():
             print("Warning: You must input data into a primary key table, before you can insert into a foreign key table!!!!\n")
             #Shows the current tables
             tables = open("tables.txt", "r")
-            print("Created Tables:\n" + tables.read())
+            print("Created Tables (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
             tables.close()
             #Gets the columns and table name
             table_name = input("What table do you want to insert into: ")
@@ -151,22 +182,90 @@ def table_insertion():
         else:
             print("Please input a vaild value.")
 
-def table_alteration():
-    pass
+def data_update():
+    x = input("How many changes do you want to make (number): ")
+    y = 0
+    while y < int(x):
+        y += 1
+        tables = open("tables.txt", "r")
+        print("From the following created Tables in the format (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
+        tables.close()
+        table_to_update = input("Which table do you want to update? ")
+        column_changing = input("Which column are you looking to change a value in? ")
+        new_val = input("What is the new value you would like to enter? ")
+        column_identifier = input("Which column is the Primary Key or you want to use as an column identifier? ")
+        value_identifier = input("What is the value you are using as an value identifier? ")
+
+        updateObject = conn.cursor()
+        updateObject.execute(f"UPDATE {table_to_update} SET {column_changing} = {new_val} WHERE {column_identifier} = {value_identifier};")
+        conn.commit()
+
 
 def delete_data():
-    pass
+    while True:
+        print(""" What would you like to do?
+    1. Remove the whole table
+    2. Remove the data from the table
+    3. Remove the whole database
+    4. Exit
+        """)
+        x = input("Please select one: ")
+        if int(x) == 1:
+            tables = open("tables.txt", "r")
+            print("Which table do you want to remove. The Created tables (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
+            tables.close()
+
+            table_to_del = input("Input the table_name that you want to delete:\n ")
+            dropObject = conn.cursor()
+            dropObject.execute(f"DROP TABLE {table_to_del};")
+            
+            path_to_del = input("\nInput the full path to del i.e(table_name:database:KeyType:Column_Name DataType, ...): ")
+            delete_from_text("tables.txt", path_to_del)
+
+        elif int(x)==2:
+            
+            print("Which table do you want to remove data from:\n ")
+            tables = open("tables.txt", "r")
+            print("Created tables (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
+            tables.close()
+
+            data_to_del = input("\nInput the table_name that you want to truncate: ")
+            truncateObject = conn.cursor()
+            truncateObject.execute(f"TRUNCATE TABLE {data_to_del};")
+
+        elif int(x) == 3:
+
+            print("Which database do you want to remove:\n ")
+            databases = open("databases.txt", "r")
+            print("Created databases:\n" + databases.read())
+            databases.close()
+
+            database_to_del = input("Input the database name: ")
+            dropObject = conn.cursor()
+            dropObject.execute(f"DROP DATABASE {database_to_del};")
+
+            delete_from_text("databases.txt", database_to_del)
+
+        elif int(x) == 4:
+            break
+        else:
+            print("Please input a valid number.")
 
 def show_tables():
-    pass
+    print("Hello, which table do you want to show?")
+    tables = open("tables.txt", "r")
+    print("Created Tables in the format (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
+    tables.close()
+
+    x = input("Please input the table_name you want to see: ")
+    y = input("Please, input the columns you want to see in coln1, coln2, ... format otherwise to see all use *: ")
+
+    showObject = conn.cursor()
+    showObject.execute(f"SELECT {y} FROM {x};")
+    query_result = showObject.fetchall()
+
+    print(tabulate(query_result))
 
 def shutdown():
     conn.close()
-
-
-
-
-
-
-
 

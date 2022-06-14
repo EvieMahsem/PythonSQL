@@ -9,9 +9,9 @@ while True:
     \t3. Databases Selection (Required)
     \t4. Table Creation
     \t5. Insert Data (Somewhat Implemented)
-    \t6. Alter Data (Not Implemented)
-    \t7. Delete Tables/Databases (Not Implemented)
-    \t8. Show Tables (Not Implemented)
+    \t6. Update Data
+    \t7. Delete Tables/Databases
+    \t8. Show Tables
     \t9. Shutdown
     """)
     x = input("What is your selection: ")
@@ -26,7 +26,7 @@ while True:
     elif int(x) == 5:
         table_insertion()
     elif int(x) == 6:
-        table_alteration()
+        data_update()
     elif int(x) == 7:
         delete_data()
     elif int(x) == 8:
