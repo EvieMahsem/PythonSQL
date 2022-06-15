@@ -8,7 +8,7 @@ while True:
     \t2. Databases Creation
     \t3. Databases Selection (Required)
     \t4. Table Creation
-    \t5. Insert Data (Somewhat Implemented)
+    \t5. Insert Data
     \t6. Update Data
     \t7. Delete Tables/Databases
     \t8. Show Tables

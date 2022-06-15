@@ -1,1 +1,3 @@
-test_table:test:PK:id int,name varchar(255)
+customer_id_info:revature_project:PK:id int,first_name varchar(255),last_name varchar(255),state varchar(255)
+customer_selection:revature_project:FK(id):id int,clothing_item varchar(255),clothing_color varchar(255)
+Online_InStore:revature_project:FK(id):id int,Online_InStore varchar(255)

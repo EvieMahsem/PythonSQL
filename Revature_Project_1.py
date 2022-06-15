@@ -2,14 +2,12 @@ import maskpass
 import mysql.connector
 import names
 import random
+from pyparsing import col
 from tabulate import tabulate
 
 
 
 
-
-def table_random():
-    pass
 
 def delete_from_text(file, input):
     with open(f"{file}", "r") as f:
@@ -149,7 +147,7 @@ def table_insertion():
     while True:
         question = input("""Welcome to data insertion:
     1. Insert data
-    2. Insert data with random values (Not Implemented)
+    2. Insert data with random values (Hard Coded, so not good for outside this project)
     3. Exit
     Enter a Number: """)
         if int(question) == 1:
@@ -176,11 +174,45 @@ def table_insertion():
                 conn.commit()    
 
         elif int(question) == 2:
-            pass
+            #Hard coded data for random
+            states = ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI","MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC","ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD","TN","TX","UT","VT","WA", "WV", "WI", "WY"]
+            clothing = ['T-Shirt', "Jeans", "Khakis", 'Blouse', "Vest", "Socks", "Gym Shorts"]
+            colors = ['red', 'blue', 'grey', 'white', 'black', 'tan', 'green', 'pink']
+            online_or_instore = ["Bought in Store", "Bought Online"] 
+            print("Warning: You must input data into a primary key table, before you can insert into a foreign key table!!!!\n")
+
+            #Shows the current tables
+            tables = open("tables.txt", "r")
+            print("Created Tables (table_name:database:KeyType:Column_Name DataType, ...):\n" + tables.read())
+            tables.close()
+
+            #Gets the columns and table name and total rows
+            table_name = input("What table do you want to insert into: ")
+            coln = input("What are the column you would like to input (column1, column2, column3,...): ")
+            num_of_row = input("How many rows do you want to input: ")
+
+
+            #Inserts random data
+            x = 0
+            while x < int(num_of_row):
+                x += 1
+                #values = [str(x), f'"{names.get_first_name()}"',f'"{names.get_last_name()}"', f'"{random.choice(states)}"']
+                # values = [str(x), f'"{random.choice(clothing)}"',f'"{random.choice(colors)}"']
+                values = [str(x), f'"{random.choice(online_or_instore)}"']
+                
+                val = ','.join(values)
+                print(val)
+                #Runs the SQL code
+                insertObject = conn.cursor()
+                insertObject.execute(f"INSERT INTO {table_name} ({coln}) VALUES ({val});")
+                conn.commit()    
+
+
         elif int(question) == 3:
             break        
         else:
             print("Please input a vaild value.")
+
 
 def data_update():
     x = input("How many changes do you want to make (number): ")
@@ -199,7 +231,6 @@ def data_update():
         updateObject = conn.cursor()
         updateObject.execute(f"UPDATE {table_to_update} SET {column_changing} = {new_val} WHERE {column_identifier} = {value_identifier};")
         conn.commit()
-
 
 def delete_data():
     while True:
